@@ -1,0 +1,37 @@
+name: Check every day at 12 PM
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+jobs:
+  post-to-telegram:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Get current timestamp
+      id: timestamp
+      run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_OUTPUT
+
+    - name: Restore Cache
+      uses: actions/cache/restore@v4
+      with:
+        path: previous_models.json
+        key: ${{ runner.os }}-sent-licences-${{ steps.timestamp.outputs.timestamp }}
+        restore-keys: |
+          ${{ runner.os }}-previous_models-
+
+    - name: Run Script
+      env:
+        bot_token: ${{ secrets.BOT_TOKEN }}
+        chat_id: ${{ secrets.CHANNEL_ID }}
+      run: |
+        python main.py
+
+    - name: Save Cache
+      uses: actions/cache/save@v4
+      with:
+        path: previous_models.json
+        key: ${{ runner.os }}-previous_models-${{ steps.timestamp.outputs.timestamp }}
