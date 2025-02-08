@@ -61,7 +61,7 @@ def post_to_telegram(new_models):
         sys.exit(1)
     
     for brand, models in new_models.items():
-        message = f"Found new models on the Carlcare website for {brand}: {', '.join(models)}"
+        message = f"Found new or edited models on the Carlcare website for {brand}: {', '.join(models)}"
         payload = {
             'chat_id': chat_id,
             'text': message
