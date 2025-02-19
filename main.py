@@ -60,14 +60,20 @@ def post_to_telegram(new_models):
         print("Error: Environment variables 'bot_token' and 'chat_id' are not set.")
         sys.exit(1)
     
+    # Create a single consolidated message with more spacing
+    message_parts = ["<blockquote><b>New or edited model(s) found on the Carlcare website</b></blockquote>\n"]  # Removed colon, added newline
     for brand, models in new_models.items():
-        message = f"Found new or edited models on the Carlcare website for {brand}: {', '.join(models)}"
-        payload = {
-            'chat_id': chat_id,
-            'text': message
-        }
-        print(f"Sending message for {brand}")
-        requests.post(f'https://api.telegram.org/bot{bot_token}/sendMessage', json=payload)
+        message_parts.append(f"\n{brand}: {', '.join(models)}\n")  # Added extra newline after each brand
+    
+    message = ''.join(message_parts)
+    
+    payload = {
+        'chat_id': chat_id,
+        'text': message,
+        'parse_mode': 'html'
+    }
+    print("Sending consolidated message")
+    requests.post(f'https://api.telegram.org/bot{bot_token}/sendMessage', json=payload)
 
 def main():
     print("Starting the main function.")
@@ -87,7 +93,7 @@ def main():
     new_models = find_new_models(current_models, previous_models)
     
     if new_models:
-        print("New models found, sending to Telegram.")
+        print("New or edited models found, sending to Telegram.")
         post_to_telegram(new_models)
         
         print("Saving current models as previous models.")
