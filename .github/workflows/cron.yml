@@ -1,7 +1,7 @@
-name: Check every day at 12 PM
+name: Check every 12th hour
 on:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: "0 */12 * * *"
   workflow_dispatch:
 
 jobs:
